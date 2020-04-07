@@ -10,11 +10,13 @@ def norm_word(line):
 input = sc.textFile("file:///sparkcourse/book.txt")
 
 words = input.flatMap(norm_word)
-count_words = words.countByValue()
+count_words = words.map(lambda x: (x, 1)).reduceByKey(lambda x,y : x+y)
+sorted_count_words = count_words.map(lambda x: (x[1],x[0])).sortByKey()
+# count_words = words.countByValue()
 
-# results = count_words.collect()
+results = sorted_count_words.collect()
 
-for k, v in count_words.items():
-	cor_word = k.encode('ascii','ignore')
+for k, v in results:
+	cor_word = v.encode('ascii','ignore')
 	if cor_word:
-		print(f" WORD -- {cor_word} -- appears--- {v}")
+		print(f" WORD -- {cor_word} -- appears--- {k}")
